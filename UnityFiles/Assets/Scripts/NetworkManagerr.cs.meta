@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 3d9afdad2139d434b86cc282ddcef6ee
+timeCreated: 1514799609
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - MMScript: {instanceID: 0}
+  - MalePrefab: {fileID: 1024936727181736, guid: 23608155d2848c344b42d62b4697338c,
+      type: 2}
+  - FemalePrefab: {fileID: 1051404128856786, guid: bc405bc95d6ad61458bc83e7b2bdf030,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
