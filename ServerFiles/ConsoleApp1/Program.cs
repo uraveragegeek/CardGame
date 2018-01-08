@@ -621,25 +621,28 @@ namespace Server
         {
             try
             {
-                if (playerClass.SelectedHero.Area == "Starting_Area")
+                if (playerClass.SelectedHero != null)
                 {
-                    if (ServerController.ClientsInStartArea.ContainsKey(playerClass))
+                    if (playerClass.SelectedHero.Area == "Starting_Area")
                     {
-                        ServerController.ClientsInStartArea.Remove(playerClass);
-                        Console.WriteLine("Removed " + playerClass.UserName + " from " + playerClass.SelectedHero.Area);
+                        if (ServerController.ClientsInStartArea.ContainsKey(playerClass))
+                        {
+                            ServerController.ClientsInStartArea.Remove(playerClass);
+                            Console.WriteLine("Removed " + playerClass.UserName + " from " + playerClass.SelectedHero.Area);
+                        }
+                        else
+                        {
+                            Console.WriteLine(ServerController.ClientsInStartArea.Count);
+                            foreach (KeyValuePair<PlayerInfo, TcpClient> kvp in ServerController.ClientsInStartArea)
+                            {
+                                Console.WriteLine(kvp.Key);
+                            }
+                        }
                     }
                     else
                     {
-                        Console.WriteLine(ServerController.ClientsInStartArea.Count);
-                        foreach (KeyValuePair<PlayerInfo, TcpClient> kvp in ServerController.ClientsInStartArea)
-                        {
-                            Console.WriteLine(kvp.Key);
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Scene is: " + playerClass.SelectedHero.Area);
+                        Console.WriteLine("Scene is: " + playerClass.SelectedHero.Area);
+                    } 
                 }
             }
             catch (Exception e)
@@ -676,33 +679,36 @@ namespace Server
         {
             try
             {
-                if (player.SelectedHero.Name == player.H1.Name)
+                if (player.SelectedHero != null)
                 {
-                    player.H1 = player.SelectedHero;
-                    player.SelectedHero = null;
-                }
-                else if (player.SelectedHero.Name == player.H2.Name)
-                {
-                    player.H2 = player.SelectedHero;
-                    player.SelectedHero = null;
-                }
-                else if (player.SelectedHero.Name == player.H3.Name)
-                {
-                    player.H3 = player.SelectedHero;
-                    player.SelectedHero = null;
-                }
-                else if (player.SelectedHero.Name == player.H4.Name)
-                {
-                    player.H4 = player.SelectedHero;
-                    player.SelectedHero = null;
-                }
-                if (player.UserName != null)
-                {
-                    FileStream stream = File.OpenWrite(player.UserName);
-                    player.FileCreated = true;
-                    MyFormatter.Serialize(stream, player);
-                    stream.Dispose();
-                    Console.WriteLine("Player file " + player.UserName + " saved");
+                    if (player.SelectedHero.Name == player.H1.Name)
+                    {
+                        player.H1 = player.SelectedHero;
+                        player.SelectedHero = null;
+                    }
+                    else if (player.SelectedHero.Name == player.H2.Name)
+                    {
+                        player.H2 = player.SelectedHero;
+                        player.SelectedHero = null;
+                    }
+                    else if (player.SelectedHero.Name == player.H3.Name)
+                    {
+                        player.H3 = player.SelectedHero;
+                        player.SelectedHero = null;
+                    }
+                    else if (player.SelectedHero.Name == player.H4.Name)
+                    {
+                        player.H4 = player.SelectedHero;
+                        player.SelectedHero = null;
+                    }
+                    if (player.UserName != null)
+                    {
+                        FileStream stream = File.OpenWrite(player.UserName);
+                        player.FileCreated = true;
+                        MyFormatter.Serialize(stream, player);
+                        stream.Dispose();
+                        Console.WriteLine("Player file " + player.UserName + " saved");
+                    } 
                 }
             }
             catch (Exception e)
