@@ -7,25 +7,24 @@ public class NPCController : MonoBehaviour {
 
     public float gravity;
     public float speed;
-    private Vector3 target;
     private Vector3 lookat;
     private CharacterController CharContr;
     public GameObject FightCircle;
-    public GameObject FightCircleSpawned;
+    private GameObject FightCircleSpawnedPrefab;
     private GameObject CurrentEnemy;
-    public Collider[] spawnArea1;
-    public Collider[] spawnArea2;
-    public Collider[] spawnArea3;
-    public Collider[] spawnArea4;
-    public Collider[] spawnArea5;
-    public Collider[] spawnArea6;
-    public Collider[] spawnArea7;
-    public Collider[] spawnArea8;
-    public Collider[] spawnArea9;
+    private Collider[] spawnArea1;
+    private Collider[] spawnArea2;
+    private Collider[] spawnArea3;
+    private Collider[] spawnArea4;
+    private Collider[] spawnArea5;
+    private Collider[] spawnArea6;
+    private Collider[] spawnArea7;
+    private Collider[] spawnArea8;
+    private Collider[] spawnArea9;
     //public Collider[] spawnArea10;
     private bool AllTrue;
     private bool CanSpawn;
-    public bool spawned;
+    public bool FightCircleSpawnedBool;
     public Vector3 BoxSize;
     private Vector3 Box1Position = new Vector3(0,0,0);
     private Vector3 Box2Position = new Vector3(10,0,0);
@@ -38,21 +37,33 @@ public class NPCController : MonoBehaviour {
     private Vector3 Box9Position = new Vector3(0, 0, -20);
     //private Vector3 Box10Position = new Vector3(0, 0, 0);
     private Vector3 MoveSpawnUp = new Vector3(0, .1f, 0);
-    public int layermask;
+    private int layermask;
+    public float Rotation;
+    public double Angle;
+    public double X;
+    public double Z;
+    public int NPCPatrolPointActive;
+    public GameObject NPCPatrol1;
+    public GameObject NPCPatrol2;
+    public float dx;
+    public float dy;
+
 
     private void Start()
     {
         CharContr = GetComponent<CharacterController>();
+        NPCPatrolPointActive = 1;
     }
 
     private void Update()
     {
-        var moveDirection = new Vector3(0, 0, 0);
-        moveDirection.y -= gravity * Time.deltaTime;
-        CharContr.Move(moveDirection * Time.deltaTime * speed);
-        if (spawned ==true)
+        if (FightCircleSpawnedBool ==true)
         {
             MoveTowardsTarget();
+        }
+        else
+        {
+            UnitPatrol();
         }
     }
 
@@ -72,7 +83,7 @@ public class NPCController : MonoBehaviour {
 
     private void OnTriggerEnter (Collider other)
     {
-        //UnityEngine.Debug.Log("Collided");
+        UnityEngine.Debug.Log("Collided");
         if (other.gameObject.tag == "Player")
         {
 
@@ -84,10 +95,10 @@ public class NPCController : MonoBehaviour {
             {
                 CanSpawn = Area1TagCheck("Player", "AgressiveNPC");
             }
-            if (CanSpawn == true && spawned == false)
+            if (CanSpawn == true && FightCircleSpawnedBool == false)
             {
-                spawned = true;
-                FightCircleSpawned = Instantiate(FightCircle, transform.position + Box1Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
+                FightCircleSpawnedBool = true;
+                FightCircleSpawnedPrefab = Instantiate(FightCircle, transform.position + Box1Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
             }
             else
             {
@@ -100,10 +111,10 @@ public class NPCController : MonoBehaviour {
                 {
                     CanSpawn = Area2TagCheck("Player", "AgressiveNPC");
                 }
-                if (CanSpawn == true && spawned == false)
+                if (CanSpawn == true && FightCircleSpawnedBool == false)
                 {
-                    spawned = true;
-                    FightCircleSpawned = Instantiate(FightCircle, transform.position + Box2Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
+                    FightCircleSpawnedBool = true;
+                    FightCircleSpawnedPrefab = Instantiate(FightCircle, transform.position + Box2Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
                 }
                 else
                 {
@@ -116,10 +127,10 @@ public class NPCController : MonoBehaviour {
                     {
                         CanSpawn = Area3TagCheck("Player", "AgressiveNPC");
                     }
-                    if (CanSpawn == true && spawned == false)
+                    if (CanSpawn == true && FightCircleSpawnedBool == false)
                     {
-                        spawned = true;
-                        FightCircleSpawned = Instantiate(FightCircle, transform.position + Box3Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
+                        FightCircleSpawnedBool = true;
+                        FightCircleSpawnedPrefab = Instantiate(FightCircle, transform.position + Box3Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
                     }
                     else
                     {
@@ -132,10 +143,10 @@ public class NPCController : MonoBehaviour {
                         {
                             CanSpawn = Area4TagCheck("Player", "AgressiveNPC");
                         }
-                        if (CanSpawn == true && spawned == false)
+                        if (CanSpawn == true && FightCircleSpawnedBool == false)
                         {
-                            spawned = true;
-                            FightCircleSpawned = Instantiate(FightCircle, transform.position + Box4Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
+                            FightCircleSpawnedBool = true;
+                            FightCircleSpawnedPrefab = Instantiate(FightCircle, transform.position + Box4Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
                         }
                         else
                         {
@@ -148,10 +159,10 @@ public class NPCController : MonoBehaviour {
                             {
                                 CanSpawn = Area5TagCheck("Player", "AgressiveNPC");
                             }
-                            if (CanSpawn == true && spawned == false)
+                            if (CanSpawn == true && FightCircleSpawnedBool == false)
                             {
-                                spawned = true;
-                                FightCircleSpawned = Instantiate(FightCircle, transform.position + Box5Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
+                                FightCircleSpawnedBool = true;
+                                FightCircleSpawnedPrefab = Instantiate(FightCircle, transform.position + Box5Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
                             }
                             else
                             {
@@ -164,10 +175,10 @@ public class NPCController : MonoBehaviour {
                                 {
                                     CanSpawn = Area6TagCheck("Player", "AgressiveNPC");
                                 }
-                                if (CanSpawn == true && spawned == false)
+                                if (CanSpawn == true && FightCircleSpawnedBool == false)
                                 {
-                                    spawned = true;
-                                    FightCircleSpawned = Instantiate(FightCircle, transform.position + Box6Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
+                                    FightCircleSpawnedBool = true;
+                                    FightCircleSpawnedPrefab = Instantiate(FightCircle, transform.position + Box6Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
                                 }
                                 else
                                 {
@@ -180,10 +191,10 @@ public class NPCController : MonoBehaviour {
                                     {
                                         CanSpawn = Area7TagCheck("Player", "AgressiveNPC");
                                     }
-                                    if (CanSpawn == true && spawned == false)
+                                    if (CanSpawn == true && FightCircleSpawnedBool == false)
                                     {
-                                        spawned = true;
-                                        FightCircleSpawned = Instantiate(FightCircle, transform.position + Box7Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
+                                        FightCircleSpawnedBool = true;
+                                        FightCircleSpawnedPrefab = Instantiate(FightCircle, transform.position + Box7Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
                                     }
                                     else
                                     {
@@ -196,10 +207,10 @@ public class NPCController : MonoBehaviour {
                                         {
                                             CanSpawn = Area8TagCheck("Player", "AgressiveNPC");
                                         }
-                                        if (CanSpawn == true && spawned == false)
+                                        if (CanSpawn == true && FightCircleSpawnedBool == false)
                                         {
-                                            spawned = true;
-                                            FightCircleSpawned = Instantiate(FightCircle, transform.position + Box8Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
+                                            FightCircleSpawnedBool = true;
+                                            FightCircleSpawnedPrefab = Instantiate(FightCircle, transform.position + Box8Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
                                         }
                                         else
                                         {
@@ -212,10 +223,10 @@ public class NPCController : MonoBehaviour {
                                             {
                                                 CanSpawn = Area9TagCheck("Player", "AgressiveNPC");
                                             }
-                                            if (CanSpawn == true && spawned == false)
+                                            if (CanSpawn == true && FightCircleSpawnedBool == false)
                                             {
-                                                spawned = true;
-                                                FightCircleSpawned = Instantiate(FightCircle, transform.position + Box9Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
+                                                FightCircleSpawnedBool = true;
+                                                FightCircleSpawnedPrefab = Instantiate(FightCircle, transform.position + Box9Position + MoveSpawnUp, Quaternion.Euler(90, 0, 0)) as GameObject;
                                             }
                                             else
                                             {
@@ -246,9 +257,20 @@ public class NPCController : MonoBehaviour {
                     }
                 }
             }
-            target = FightCircleSpawned.gameObject.transform.GetChild(4).transform.position;
             CurrentEnemy = other.gameObject;
         }
+        else if (other.gameObject.tag == "PatrolPoints")
+        {
+            if (other.gameObject.name == "NPCPatrolPoint1")
+            {
+                NPCPatrolPointActive = 2;
+            } else if ( other.gameObject.name == "NPCPatrolPoint2")
+            {
+                NPCPatrolPointActive = 1;
+            }
+        }
+
+        
     }
 
     public bool Area1TagCheck(string tag, string tag2)
@@ -495,16 +517,54 @@ public class NPCController : MonoBehaviour {
         }
     }*/
 
-    private void MoveTowardsTarget()
+    private void MoveTowardsTarget() // gets vectors and rotates and moves target untell it is in position one, will have to add checks for already occupied positions later
     {
-        lookat = (CurrentEnemy.transform.position - transform.position).normalized;
-        var offset = target - transform.position;
-        if (offset.magnitude > .2f)
-        {
-            offset = offset.normalized * speed;
-            CharContr.Move(offset * Time.deltaTime);
-        }
-        transform.rotation = Quaternion.RotateTowards(transform.rotation,Quaternion.LookRotation(lookat), speed * 5 * Time.deltaTime); //rotates to the wrong point with this, works with the rotat.lookat, but cant be slowed down.
-    }//poiont the dude at the wronge point, i have no idea why
+        lookat = (FightCircleSpawnedPrefab.transform.position - transform.position).normalized; 
+        float step = speed * Time.deltaTime;
+        Vector3 newRot = Vector3.RotateTowards(transform.forward, lookat, step, 0.0f);
+        UnityEngine.Debug.DrawRay(transform.position, newRot, Color.red);
+        newRot.y = newRot.y * 0;
+        transform.rotation = Quaternion.LookRotation(newRot);
+        dx = Mathf.Abs(transform.position.x - FightCircleSpawnedPrefab.transform.Find("Team2Slot1").transform.position.x);
+        dy = Mathf.Abs(transform.position.y - FightCircleSpawnedPrefab.transform.Find("Team2Slot1").transform.position.y);
 
+        if (dx > .1f || dy > .1f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, FightCircleSpawnedPrefab.transform.Find("Team2Slot1").transform.position, step);
+        }
+    }
+    
+    public void UnitPatrol() // uses 2 points to move between patrol points.
+    {
+        if (NPCPatrolPointActive == 1)
+        {
+            //rotation controller
+            Vector3 targetDir = NPCPatrol1.transform.position - transform.position;
+            float step = speed * Time.deltaTime;
+            Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0f);
+            UnityEngine.Debug.DrawRay(transform.position, newDir, Color.red);
+            newDir.y = newDir.y * 0;
+            transform.rotation = Quaternion.LookRotation(newDir);
+            //rotation controler
+
+            //MoveControler
+            transform.position = Vector3.MoveTowards(transform.position, NPCPatrol1.transform.position, step);
+            //MoveControler 
+        } else if (NPCPatrolPointActive == 2)
+        {
+            //rotation controller
+            Vector3 targetDir = NPCPatrol2.transform.position - transform.position;
+            float step = speed * Time.deltaTime;
+            Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0f);
+            UnityEngine.Debug.DrawRay(transform.position, newDir, Color.red);
+            newDir.y = newDir.y * 0;
+            transform.rotation = Quaternion.LookRotation(newDir);
+            //rotation controler
+
+            //MoveControler
+            transform.position = Vector3.MoveTowards(transform.position, NPCPatrol2.transform.position, step);
+            //MoveControler 
+        }
+    }
+    
 }

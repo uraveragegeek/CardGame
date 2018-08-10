@@ -48,75 +48,15 @@ public class MainMenuScript : MonoBehaviour {
     public void ButtonAddUser()
     {
         NtwkMngr.SendAddUserData(Username.text, Password.text);
-    }
+    }// send request to server when player atempts to create a new user name and password
 
     public void ButtonLogin()
     {
         NtwkMngr.SendLoginData(Username.text,Password.text);
-    }
+    }//send a request to the server whena  player attempts to login to the game
 
-    public void LoginResponseHandler(string response)
+    public void ResponseHandler(string response)
     {
-        if (response == "Logging in")
-        {
-            Response.text = response;
-            
-        }
-        else
-        if (response == "Password incorect")
-        {
-            Response.text = response;
-        }
-        else
-        if (response == "Could not get password")
-        {
-            Response.text = response;
-        }
-        else
-        if (response == "User name does not exist")
-        {
-            Response.text = response;
-        }
-        else
-        if (response == "YAAAYYY!!! You are the first person to ever use the server!! Sadly you must create an account befor you log in.")
-        {
-            Response.text = response;
-        }
-        else
-        if (response == "User name or password is blank.")
-        {
-            Response.text = response;
-        }
-        else
-        if (response == "Player is already Logged in")
-        {
-            Response.text = response;
-        }
-    }
-
-    public void AddUserResponseHandler(string response)
-    {
-        if (response == "Username Created")
-        {
-            Response.text = response;
-        }
-        else
-        if (response == "Username is already taken")
-        {
-            Response.text = response;
-        }
-        else
-        if (response == "User name or password is blank.")
-        {
-            Response.text = response;
-        }
-    }
-
-    public void LoadingStartAreaResponceHandler(string responce)
-    {
-        if (responce == "Failed to add")
-        {
-            Response.text = responce;
-        }
-    }
+        Response.text = response;
+    }//used to change the message that the player gets when they do something in the main menue
 }

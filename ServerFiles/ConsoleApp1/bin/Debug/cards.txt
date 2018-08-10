@@ -1,0 +1,5 @@
+FireBall,Fire,5
+WaterBall,Water,5
+EarthBall,Earth,5
+ElectricBall,Earth,5
+PlantBall,Plant,5

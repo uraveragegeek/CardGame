@@ -14,6 +14,7 @@ public class OverlayController : MonoBehaviour {
     private float MinHP;
     private float CalcHP;
     public GameObject BottomBackroundGO;
+    public GameObject MainMenueInGame;
 
 
 
@@ -27,7 +28,7 @@ public class OverlayController : MonoBehaviour {
         }
         CurrentHP = 100;
         /* Sets Overlay visuals on start */
-        ChangeBottomOverlayVusials();
+        //ChangeBottomOverlayVusials();
 	}
 	
 	// Update is called once per frame
@@ -64,8 +65,11 @@ public class OverlayController : MonoBehaviour {
         HealthFill.fillAmount = CalcHP;
         /* Sets health text to current health rounded to nearest int */
         HealthText.text = ("Health: " + Mathf.Round(CurrentHP));
+
+        //used to monitor if player has pressed escape key
+        InGameMainMenueController();
 	}
-    /* used to change bottom overlay visability */
+    /* used to change bottom overlay visability, pretty sure this will need to be changes as it migh spawna overlay for every model and could lag the game 
     public void ChangeBottomOverlayVusials()
     {
         if (NMScript.ClientSpawned != true)
@@ -76,5 +80,35 @@ public class OverlayController : MonoBehaviour {
         {
             BottomBackroundGO.SetActive(true);
         }
+    }*/
+
+    public void InGameMainMenueController()
+    {
+
+        if (Input.GetKeyDown(KeyCode.Escape) && NMScript.ClientSpawned == true)
+        {
+            if (MainMenueInGame.activeSelf == false)
+            {
+                MainMenueInGame.SetActive(true);
+            }
+            else if (MainMenueInGame.activeSelf)
+            {
+                MainMenueInGame.SetActive(false);
+            }
+        }
+    }
+
+    public void ResumeButtonClicked()
+    {
+        MainMenueInGame.SetActive(false);
+    }
+
+    public void QuitButtonClicked()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }

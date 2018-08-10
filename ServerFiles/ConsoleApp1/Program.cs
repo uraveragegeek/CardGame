@@ -24,11 +24,13 @@ namespace Server
         //public static Dictionary<string, TcpClient> ConnectedClients = new Dictionary<string, TcpClient>();
         public static Dictionary<PlayerInfo, TcpClient> ClientsInStartArea = new Dictionary<PlayerInfo, TcpClient>();
         public static List<PlayerInfo> PlayersOnline = new List<PlayerInfo>();
+        public static CardInfo CardsLoader = new CardInfo();
 
         static void Main() // program starts form here
         {
             ShutdownThread = new Thread(Shutdown);//creat new thread and check if user has typed stop
             ShutdownThread.Start();
+            CardInfoGetter();//gets card info befor opening the server conections up
             ConnectToUnity.ClientConnectorTCP();
         }
 
@@ -36,6 +38,7 @@ namespace Server
         {
             do
             {
+                
                 exitString = Console.ReadLine();
                 if (exitString == "stop")
                 {
@@ -50,6 +53,24 @@ namespace Server
             PlayersOnline.Clear();
         }//used to shut down the server
 
+        static void CardInfoGetter() 
+        {
+            string[] text = System.IO.File.ReadAllLines("cards.txt"); //loads the file and reads it
+            CardsLoader.CurrentCard = new PlayerInfo.Card();
+            CardsLoader.AllCards = new List<PlayerInfo.Card>();
+            foreach (string line in text) //cycles through all the lines got from cards.txt
+            {
+                //Console.WriteLine(line);
+                string[] words = line.Split(','); // plits the lines into words using comma as a divider
+                CardsLoader.CurrentCard.Name = (string)words.GetValue(0); //takes values and applies them to class card in there respected spots
+                CardsLoader.CurrentCard.Type = (string)words.GetValue(1);
+                string damageString = (string)words.GetValue(2); //have to save this as a string befor converting it to a int
+                CardsLoader.CurrentCard.Damage = (int) Int32.Parse(damageString);
+                Console.WriteLine("Name:" + CardsLoader.CurrentCard.Name + ", Type:" + CardsLoader.CurrentCard.Type + ", Damage:" + CardsLoader.CurrentCard.Damage); // this is used for debug,makes sure it read the info correctly
+                CardsLoader.AllCards.Add(CardsLoader.CurrentCard); //adds the current card to all cards list
+                Console.WriteLine(CardsLoader.AllCards.Count); // used for debug to make sure card was added to list
+            }
+        }// gats card info from text file on server, runs in main before opening connections
 
     }
 
@@ -92,7 +113,7 @@ namespace Server
     public class HandleClientsUDP
     {
 
-    }
+    }// eventually going to use this to handle player movements
 
     [Serializable]
     public class HandleClientsTCP
@@ -108,19 +129,20 @@ namespace Server
             ClientThread.Start();
         } /* new thread starts here */
 
-        private void DataManager() /* This is new thread */
+        private void DataManager() /* This is the new thread */
         {
             /* initalizes variables */
             NetworkStream NtwrkStrm = ClientSocket.GetStream();
             IFormatter MyFormatter = new BinaryFormatter();
             DataBaseHandlerTCP Dbh = new DataBaseHandlerTCP();
             PlayerInfo PlayerClass = new PlayerInfo();
+            CardInfo CardClass = new CardInfo();
             /* starts loop to check for data being recieved from client */
             while (true)
             {
                 try
                 {
-                    /* client will send data in this order: type of data, info,info,info........ */
+                    /* client will send data in this order: type of data, info,info,info........ all data is sent as strings, may change in futur to reduce throughput */
                     type = (string)MyFormatter.Deserialize(NtwrkStrm);//Recieve
                     NtwrkStrm.Flush();
                     /* type of data is what i use to know where to send the data on the server side */
@@ -438,6 +460,7 @@ namespace Server
     {
         Dictionary<string, string> UserNamesAndPasswords = new Dictionary<string, string>();
         IFormatter MyFormatter = new BinaryFormatter();
+        ServerController SC = new ServerController();
 
         public string CheckIfUserExist(string Login, string Pass)
         {
@@ -728,6 +751,8 @@ namespace Server
                     PlayerInfo player = (PlayerInfo)MyFormatter.Deserialize(stream);
                     stream.Dispose();
                     Console.WriteLine("Player file " + player.UserName + " loaded");
+                    player.AllCards = ServerController.CardsLoader.AllCards;
+                    Console.WriteLine("updated all cards from server, Count:" + player.AllCards.Count);
                     return player;
                 }
                 else
@@ -763,5 +788,6 @@ namespace Server
                 Console.WriteLine(e);
             }
         } // adds user to whatever scene he is logging into
+
     }
 }

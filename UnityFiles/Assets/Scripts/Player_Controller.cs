@@ -27,10 +27,11 @@ public class Player_Controller : MonoBehaviour {
     private Vector3 moveDirection;
     public CharacterController CharContr;
     public Camera playercam;
-    public NetworkManagerr NMScript;
+    private NetworkManagerr NMScript;
+    private OverlayController OLCScript;
     public AudioListener AudioListener;
     private TcpClient ServerConnection;
-    public float rotation;
+    //public float rotation;
     private Rigidbody rb;
     public bool moving;
     public bool CloneMoving;
@@ -46,10 +47,11 @@ public class Player_Controller : MonoBehaviour {
 
     private void Start()
     {
+        OLCScript = gameObject.GetComponent<OverlayController>();
         NMScript = GameObject.Find("NetworkManager").GetComponent<NetworkManagerr>();
         ServerConnection = NMScript.TcpClnt;
         rb = gameObject.GetComponent<Rigidbody>();
-    }
+    }// get referance to network manager script and trnasfers variables over to this script to be used
 
     void FixedUpdate()
     {
@@ -67,12 +69,12 @@ public class Player_Controller : MonoBehaviour {
             CloneMoving = false;
         }
         LastPosition = FirstPosition;
-    }
+    }//runs a set of functions, such as player position and checks if player has moved to activate animations of players on other players screens
 
     private void Update()
     {
-        rotation = transform.rotation.eulerAngles.y;
-    }
+       // rotation = transform.rotation.eulerAngles.y; //used for debugging perpouses
+    } // only have rotations in here, was using it for debugging perpouses
 
     public void PlayerController()
     {
@@ -90,7 +92,7 @@ public class Player_Controller : MonoBehaviour {
                 MovementFinalizer();
             } 
         }
-    }
+    }// this function is used to run all the movment specific functions, did this for organization perpouses
 
     public void MovementControllerPlayer()
     {
@@ -132,10 +134,9 @@ public class Player_Controller : MonoBehaviour {
             }
 
             moveDirection = transform.TransformDirection(moveDirection);
-            //moveDirection *= speed; 
         }
 
-    }
+    }// used to actually move the carector around, also controls the bool moving
 
     public void RotationControllerPlayer()
     {
@@ -155,7 +156,7 @@ public class Player_Controller : MonoBehaviour {
                 moving = true;
             }
         }
-    }
+    }// used for rotation perpouses, also controls moving bool
 
     public void JumpControllerPlayer()
     {
@@ -177,13 +178,13 @@ public class Player_Controller : MonoBehaviour {
                 moving = true;
             }
         }
-    }
+    }//used for jumping, also controlles the moving bool
 
     public void MovementFinalizer()
     {
         moveDirection.y -= gravity * Time.deltaTime;
         CharContr.Move(moveDirection);
-    }
+    }// used to apply the conditions that happened in all teh functions befor it, aslo applies gravity to the player
 
     public void CameraAndListenerController()
     {
@@ -197,6 +198,10 @@ public class Player_Controller : MonoBehaviour {
             {
                 AudioListener.enabled = true;
             }
+            if (OLCScript.BottomBackroundGO.activeSelf == false)
+            {
+                OLCScript.BottomBackroundGO.SetActive(true);
+            }
         }
         else
         {
@@ -208,8 +213,12 @@ public class Player_Controller : MonoBehaviour {
             {
                 AudioListener.enabled = false;
             }
+            if (OLCScript.BottomBackroundGO.activeSelf == true)
+            {
+                OLCScript.BottomBackroundGO.SetActive(false);
+            }
         }
-    }
+    }// checks if the player that is playing on this pc is the one controling the model, if true activates camera and sound for this model, if false deactivates them
 
     public void AnimationController()
     {
@@ -222,7 +231,7 @@ public class Player_Controller : MonoBehaviour {
         {
             anim.Play("Idle");
         }
-    }
+    }// playes the correct animation based on if the model is moving or not
 
     public void SendPlayerPosition()
     {
@@ -263,5 +272,5 @@ public class Player_Controller : MonoBehaviour {
                 }
             }
         }
-    }
+    }// sends the players current position to the server and the server relays it back to the other player, will update this eventually to make it so people cannot use speed cheats
 }

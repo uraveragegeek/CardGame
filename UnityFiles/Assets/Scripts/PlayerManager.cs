@@ -24,13 +24,4 @@ public class PlayerManager : MonoBehaviour {
         NWMScript = GameObject.Find("NetworkManager").GetComponent<NetworkManagerr>();
         NWMScript.SendLevelWasLoaded();
     }
-
-    private void FixedUpdate()
-    {
-       
-    }
-
-    
-
-    
 }

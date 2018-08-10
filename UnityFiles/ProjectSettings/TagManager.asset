@@ -6,6 +6,7 @@ TagManager:
   tags:
   - StaticObjects
   - AgressiveNPC
+  - PatrolPoints
   layers:
   - Default
   - TransparentFX

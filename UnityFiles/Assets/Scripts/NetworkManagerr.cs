@@ -35,12 +35,12 @@ public class NetworkManagerr : MonoBehaviour
 
     private void Awake()
     {
-        DontDestroyOnLoad(this);
+        DontDestroyOnLoad(this); //makes sure unity does not destroy this
     }
 
     private void Start()
     {
-        LevelLoaded = false;
+        LevelLoaded = false; // sets level loaded to false right away as the game will be loading at this point
     }
 
     private void FixedUpdate()
@@ -52,7 +52,7 @@ public class NetworkManagerr : MonoBehaviour
     {
         if (level == 1)
         {
-            LevelLoaded = true;
+            LevelLoaded = true; // checks if the level of 1 was loaded, that is starting area level
         }
     }
 
@@ -72,7 +72,7 @@ public class NetworkManagerr : MonoBehaviour
         {
             MMScript.Connected();
         }
-    } // trys to connect the player to the server
+    } // trys to connect the player to the server, this is activated form the main menue script
 
     public void SendLoginData(string UserNme, string Password)
     {
@@ -81,7 +81,7 @@ public class NetworkManagerr : MonoBehaviour
         {
             if (UserNme == "" || Password == "")
             {
-                MMScript.LoginResponseHandler("User name or password is blank.");
+                MMScript.ResponseHandler("User name or password is blank.");
             }
             else
             {
@@ -103,15 +103,15 @@ public class NetworkManagerr : MonoBehaviour
         {
             UnityEngine.Debug.Log(e);
         }
-    } //1
+    } //1 sends request to server to ligin using the current info from player
 
-    public void SendAddUserData(string usernme, string password)
+    public void SendAddUserData(string usernme, string password) //same as login method exept with add user
     {
         try
         {
             if (usernme == "" || password == "")
             {
-                MMScript.AddUserResponseHandler("User name or password is blank.");
+                MMScript.ResponseHandler("User name or password is blank.");
             }
             else
             {
@@ -135,14 +135,14 @@ public class NetworkManagerr : MonoBehaviour
         }
     }
 
-    public void LoadCCLevel()
+    public void LoadCCLevel() 
     {
         SceneManager.LoadScene("Character_Pick_Creation");
     }//3
 
     public void LoadLevel()
     {
-        SceneManager.LoadScene(PlayerClass.SelectedHero.Area);
+        SceneManager.LoadScene(PlayerClass.SelectedHero.Area); //loads whatever area was saved on teh player class, will add something for position eventually
     }
 
     public void SendCCRequest(string name, string gender, string H)
@@ -158,7 +158,7 @@ public class NetworkManagerr : MonoBehaviour
         NtwrkStrm.Flush();
         MyFormatter.Serialize(NtwrkStrm, H);
         NtwrkStrm.Flush();
-    }
+    }//send creat character request to the server
 
     public void SendDeleteRequest(string H)
     {
@@ -176,7 +176,7 @@ public class NetworkManagerr : MonoBehaviour
             UnityEngine.Debug.Log(e);
             throw;
         }
-    }
+    }//same as SendCCRequest exept to delete a character
 
     public void SendLoadLevelRequest()
     {
@@ -211,24 +211,24 @@ public class NetworkManagerr : MonoBehaviour
 
         MyFormatter.Serialize(NtwrkStrm, "LevelWasLoaded");
         NtwrkStrm.Flush();
-    }
+    }// lets the server know the player loaded a area so that the server cna send to other players to spawn in clone
 
     public void SpawnPlayer(List<PlayerInfo> list)
     {
         try
         {
             UnityEngine.Debug.Log(list.Count);
-            foreach (PlayerInfo player in list)
+            foreach (PlayerInfo player in list) //cycles through list 
             {
-                if (player.SelectedHero.Name != PlayerClass.SelectedHero.Name)
+                if (player.SelectedHero.Name != PlayerClass.SelectedHero.Name) //checks to make sure the new player is not actually the current player
                 {
-                    if (!SpawnedPlayers.ContainsKey(player))
+                    if (!SpawnedPlayers.ContainsKey(player)) // makes sure the player was not spawen in yet befor attempting to spawn a clone
                     {
                         UnityEngine.Debug.Log("Spawning");
                         if (player.SelectedHero.Gender == "Male")
                         {
                             if (PlayerClass.SelectedHero.xPosition != 0 || PlayerClass.SelectedHero.yPosition != 0 || PlayerClass.SelectedHero.zPosition != 0)
-                            {
+                            {//was ment to put player clone into last known position, currently does not work right, need to fix
                                 GameObject SpawnedPlayer = Instantiate(MalePrefab, new Vector3(PlayerClass.SelectedHero.xPosition, PlayerClass.SelectedHero.yPosition, PlayerClass.SelectedHero.zPosition), Quaternion.Euler(0, PlayerClass.SelectedHero.Rotation, 0));
                                 SpawnedPlayer.name = player.SelectedHero.Name;
                                 SpawnedPlayers.Add(player, SpawnedPlayer);
@@ -259,7 +259,7 @@ public class NetworkManagerr : MonoBehaviour
                 }
             }
             if (ClientSpawned != true)
-            {
+            {// makes sure client has not spawned yet and spawns them in ifthey havent
                 if (PlayerClass.SelectedHero.Gender == "Male")
                 {
                     ClientCharacter = Instantiate(MalePrefab, transform.position, Quaternion.Euler(0, 0, 0));
@@ -267,7 +267,7 @@ public class NetworkManagerr : MonoBehaviour
                     SpawnedPlayers.Add(PlayerClass, ClientCharacter);
                     ClientSpawned = true;
                     OverlayController OLScript = ClientCharacter.GetComponent<OverlayController>();
-                    OLScript.ChangeBottomOverlayVusials();
+                    //OLScript.ChangeBottomOverlayVusials();
                 }
                 else if (PlayerClass.SelectedHero.Gender == "Female")
                 {
@@ -276,7 +276,7 @@ public class NetworkManagerr : MonoBehaviour
                     SpawnedPlayers.Add(PlayerClass, ClientCharacter);
                     ClientSpawned = true;
                     OverlayController OLScript = ClientCharacter.GetComponent<OverlayController>();
-                    OLScript.ChangeBottomOverlayVusials();
+                    //OLScript.ChangeBottomOverlayVusials();
                 }
             }
         }
@@ -285,7 +285,7 @@ public class NetworkManagerr : MonoBehaviour
             UnityEngine.Debug.Log(e);
             throw;
         }
-    }
+    }//spawns clone for other player who load the area, and also spawns player and adds them to the spawned list
 
     public void ServerResponceHandler()
     {
@@ -294,7 +294,7 @@ public class NetworkManagerr : MonoBehaviour
             NetworkStream NtwrkStrm = TcpClnt.GetStream();
             IFormatter MyFormatter = new BinaryFormatter();
             if (NtwrkStrm.DataAvailable)
-            {
+            {// this handles all incoming communications from the server
                 try
                 {
                     string type = (string)MyFormatter.Deserialize(NtwrkStrm);
@@ -304,12 +304,13 @@ public class NetworkManagerr : MonoBehaviour
                         UnityEngine.Debug.Log("Login Info Recived");
                         string response = (string)MyFormatter.Deserialize(NtwrkStrm);
                         NtwrkStrm.Flush();
-                        MMScript.LoginResponseHandler(response);
+                        MMScript.ResponseHandler(response);
                         if (response == "Logging in")
                         {
                             PlayerClass = (PlayerInfo)MyFormatter.Deserialize(NtwrkStrm);
                             NtwrkStrm.Flush();
                             UnityEngine.Debug.Log("PlayerClass.Name = " + PlayerClass.UserName);
+                            //UnityEngine.Debug.Log(PlayerClass.AllCards.Count);
                             LoadCCLevel();
                         }
                         return;
@@ -318,7 +319,7 @@ public class NetworkManagerr : MonoBehaviour
                     {
                         string response = (string)MyFormatter.Deserialize(NtwrkStrm);
                         NtwrkStrm.Flush();
-                        MMScript.AddUserResponseHandler(response);
+                        MMScript.ResponseHandler(response);
                         return;
                     }
                     else if (type == "CCRequest")
